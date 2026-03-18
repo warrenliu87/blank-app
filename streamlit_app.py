@@ -17,10 +17,19 @@ COUNTRY_NAMES = {
     "EU27_2020": "EU27"
 }
 
+from streamlit.errors import StreamlitSecretNotFoundError
+
 def get_cohere_client():
-    api_key = st.secrets.get("COHERE_API_KEY") or os.getenv("COHERE_API_KEY")
+    api_key = None
+
+    try:
+        api_key = st.secrets["COHERE_API_KEY"]
+    except (StreamlitSecretNotFoundError, KeyError):
+        api_key = os.getenv("COHERE_API_KEY")
+
     if not api_key:
         return None
+
     return cohere.ClientV2(api_key=api_key)
 
 BASE_URL = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m"
